@@ -92,4 +92,41 @@ server.delete("/api/users/:id", (req, res) => {
   }
 });
 
+server.put("/api/users/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, bio } = req.body;
+
+    let userFound = users.filter((user) => id === user.id)[0];
+
+    if (userFound) {
+      if (!name || !bio) {
+        return res
+          .status(400)
+          .json({ message: "Please provide name and bio for the user." });
+      }
+      const updatedUserInfo = { ...userFound, name, bio };
+      console.log(updatedUserInfo);
+
+      users = users.map((user) => {
+        if (user.id === updatedUserInfo.id) {
+          return updatedUserInfo;
+        } else {
+          return user;
+        }
+      });
+
+      return res.status(200).json({ updatedUserInfo });
+    } else {
+      return res
+        .status(404)
+        .json({ message: "The user with the specified ID does not exist." });
+    }
+  } catch (error) {
+    res
+      .status(500)
+      .json({ errorMessage: "The user information could not be modified." });
+  }
+});
+
 server.listen(port, () => console.log(`Server is on http://localhost:${port}`));
