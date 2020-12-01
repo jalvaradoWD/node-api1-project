@@ -3,7 +3,7 @@ const shortid = require("shortid");
 const server = express();
 const port = 3000;
 
-const users = [];
+let users = [];
 
 server.use(express.json());
 
@@ -23,11 +23,17 @@ server.get("/api/users/:id", (req, res) => {
   try {
     const { id } = req.params;
 
-    res.status(200).json(users.filter((user) => id === user.id)[0]);
+    const userFound = users.filter((user) => id === user.id)[0];
+    console.log(userFound);
+    return userFound
+      ? res.status(200).json(userFound)
+      : res
+          .status(404)
+          .json({ message: "The user with the specified ID does not exist." });
   } catch (error) {
     res
       .status(500)
-      .json({ errorMessage: "The user with the specified ID does not exist." });
+      .json({ errorMessage: "The user information could not be retrieved." });
   }
 });
 
@@ -56,6 +62,33 @@ server.post("/api/users", (req, res) => {
     res.status(500).json({
       errorMessage: "There was an error while saving the user to the database.",
     });
+  }
+});
+
+/**
+ * @METHOD - delete
+ * @DESCRIPTION - Deleting a user from the database with a givin ID.
+ */
+
+server.delete("/api/users/:id", (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const userFound = users.filter((user) => id === user.id)[0];
+
+    if (userFound) {
+      users = users.filter((user) => user.id !== userFound.id);
+
+      return res
+        .status(200)
+        .json({ message: `User "${userFound.name}" Deleted`, user: userFound });
+    } else {
+      return res
+        .status(404)
+        .json({ message: "The user with the specified ID does not exist." });
+    }
+  } catch (error) {
+    res.status(500).json({ errorMessage: "The user could not be removed." });
   }
 });
 
