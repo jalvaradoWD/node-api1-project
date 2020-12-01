@@ -24,7 +24,6 @@ server.get("/api/users/:id", (req, res) => {
     const { id } = req.params;
 
     const userFound = users.filter((user) => id === user.id)[0];
-    console.log(userFound);
     return userFound
       ? res.status(200).json(userFound)
       : res
@@ -106,7 +105,6 @@ server.put("/api/users/:id", (req, res) => {
           .json({ message: "Please provide name and bio for the user." });
       }
       const updatedUserInfo = { ...userFound, name, bio };
-      console.log(updatedUserInfo);
 
       users = users.map((user) => {
         if (user.id === updatedUserInfo.id) {
